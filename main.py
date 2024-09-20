@@ -10,7 +10,7 @@ class Interface:
     def __init__(self):
         """Initializes the class that will keep track of all habits."""
         self.habit_tracker = HabitTracker()
-        self.choices = {"1": self.habit_tracker.add_habit, "2": self.exit}
+        self.choices = {"1": self.add_habit, "2": self.exit}
 
     @staticmethod
     def display_menu():
@@ -19,6 +19,15 @@ class Interface:
         print("1. Add habit")
         print("2. Exit")
         print("")
+
+    def add_habit(self):
+        """Create a new habit."""
+        name = input("Choose a habit`s name: ")
+        periodicity = input("Choose between daily, weekly, or monthly periodicity: ")
+        while periodicity not in ["daily", "weekly", "monthly"]:
+            periodicity = input("Choose a valid periodicity: ")
+        description = input("Clearly and concisely describe the habits` task: ")
+        self.habit_tracker.add_habit(name, periodicity, description)
 
     @staticmethod
     def exit():
