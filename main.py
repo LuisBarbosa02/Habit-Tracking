@@ -40,6 +40,9 @@ class Interface:
             self.display_menu()
             choice = input("Choose an option: ")
             choice = self.choices.get(choice)
+            while choice is None:
+                choice = input("Choose a valid option: ")
+                choice = self.choices.get(choice)
             choice()
 
 
