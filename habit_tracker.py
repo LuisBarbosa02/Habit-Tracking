@@ -3,7 +3,7 @@ class Habit:
     A class storing information about habits.
 
     :ivar int id: A unique habit id.
-    :ivar str name: The habit`s name.
+    :ivar str _name: The habit`s name.
     :ivar str periodicity: Period in which the habit must be completed.
     :ivar str description: Clear and concise description of the habit`s task.
     :ivar datetime.datetime creation_date: The date the habit was created.
@@ -22,7 +22,7 @@ class Habit:
         :param str description: lear and concise description of the habit`s task.
         """
         self.id = None
-        self.name = name
+        self._name = name
         self.periodicity = periodicity
         self.description = description
         self.creation_date = None
@@ -30,6 +30,10 @@ class Habit:
         self.longest_streak = 0
         self.streak_breaks = 0
         self.log = []
+
+    @property
+    def name(self):
+        return self._name
 
 
 class HabitTracker:
@@ -54,3 +58,6 @@ class HabitTracker:
         """
         habit = Habit(name, periodicity, description)
         self.habits.append(habit)
+
+    def view_habits(self):
+        return ", ".join([habit.name for habit in self.habits])

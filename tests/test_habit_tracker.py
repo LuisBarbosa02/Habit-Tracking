@@ -16,3 +16,6 @@ def test_add_habit(tracker):
     if not isinstance(tracker.habits[-1], Habit):
         errors.append("Something else than a Habit was stored.")
     assert not errors, "\n{}".format("\n".join(errors))
+
+def test_view_habits(tracker):
+    assert tracker.view_habits() == ', '.join([habit.name for habit in tracker.habits])
