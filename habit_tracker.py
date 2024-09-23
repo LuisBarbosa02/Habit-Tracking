@@ -77,6 +77,15 @@ class HabitTracker:
         habit = Habit(habit_id, name, periodicity, description, creation_date)
         self.habits.append(habit)
 
+    def delete_habit(self, name):
+        """Delete a habit from the database, and inside the class."""
+        with sqlite3.connect("habits.db") as conn:
+            cur = conn.cursor()
+            cur.execute("DELETE FROM habits WHERE habit_id = ?;", (self._get_habit(name).habit_id,))
+            conn.commit()
+
+        self.habits = [habit for habit in self.habits if habit.name != name]
+
     def view_habits(self):
         """Returns a string containing all habits' names."""
         return ", ".join([habit.name for habit in self.habits])
@@ -101,3 +110,7 @@ class HabitTracker:
                                          datetime.datetime.strptime(creation_date, "%Y-%m-%d").today()))
 
             conn.commit()
+
+    def _get_habit(self, name):
+        """Get an instance of a Habit by its name."""
+        return [habit for habit in self.habits if habit.name == name][0]
