@@ -33,9 +33,6 @@ class TestHabitTracker:
 
         assert not errors, "\n{}".format("\n".join(errors))
 
-    def test_view_habits(self, tracker):
-        assert tracker.view_habits() == ', '.join([habit.name for habit in tracker.habits])
-
     def test_get_habit(self, tracker):
         habit = tracker._get_habit("Test")
         assert habit.habit_id == [habit.habit_id for habit in tracker.habits if habit.name == "Test"][0]
@@ -60,5 +57,26 @@ class TestHabitTracker:
             cur.execute("SELECT * FROM habits WHERE habit_id = ?;", (del_habit.habit_id,))
             if cur.fetchone():
                 errors.append("The value was not excluded from the database.")
+
+        assert not errors, "\n".join(errors)
+
+    def test_view_habits(self, tracker):
+        tracker.add_habit("Test1", "daily", "Simple test 1.")
+        tracker.add_habit("Test2", "weekly", "Simple test 2.")
+        tracker.add_habit("Test3", "monthly", "Simple test 3.")
+        errors = []
+
+        if "Test1" not in tracker.view_habits("daily"):
+            errors.append("Daily filter is not working.")
+        if "Test2" not in tracker.view_habits("weekly"):
+            errors.append("Weekly filter is not working.")
+        if "Test3" not in tracker.view_habits("monthly"):
+            errors.append("Monthly filter is not working.")
+        if "Test1, Test2, Test3" not in tracker.view_habits(''):
+            errors.append("Viewing all habits is not working")
+
+        tracker.delete_habit("Test1")
+        tracker.delete_habit("Test2")
+        tracker.delete_habit("Test3")
 
         assert not errors, "\n".join(errors)

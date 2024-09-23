@@ -39,9 +39,15 @@ class Interface:
 
     def view_habits(self):
         """View the name of all habits."""
-        print(self.habit_tracker.view_habits())
+        periodicity = input("Press Enter to view all habits, "
+                            "or choose between (daily, weekly, monthly) to filter: ").strip().lower()
+        while periodicity not in ['', 'daily', 'weekly', 'monthly']:
+            periodicity = input("Choose a valid option: ").strip().lower()
+
+        print(self.habit_tracker.view_habits(periodicity))
 
     def delete_habit(self):
+        """Delete a habit."""
         name = input("What is the name of the habit to be deleted? ")
         while name not in [habit.name for habit in self.habit_tracker.habits]:
             name = input("That habit does not exists, choose a valid name: ")

@@ -86,9 +86,12 @@ class HabitTracker:
 
         self.habits = [habit for habit in self.habits if habit.name != name]
 
-    def view_habits(self):
+    def view_habits(self, periodicity):
         """Returns a string containing all habits' names."""
-        return ", ".join([habit.name for habit in self.habits])
+        if periodicity == '':
+            return ", ".join([habit.name for habit in self.habits])
+        else:
+            return ", ".join([habit.name for habit in self.habits if habit.periodicity == periodicity])
 
     def load_habits(self):
         """Load habits from a database into the class."""
