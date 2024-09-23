@@ -5,6 +5,8 @@ from habit_tracker import HabitTracker
 class Interface:
     """
     Interface that simplifies the interaction with the program.
+
+    :ivar habit_tracker.HabitTracker habit_tracker: The class that manages all the habits'
     """
 
     def __init__(self):
@@ -31,11 +33,12 @@ class Interface:
         self.habit_tracker.add_habit(name, periodicity, description)
 
     def view_habits(self):
+        """View the name of all habits."""
         print(self.habit_tracker.view_habits())
 
     @staticmethod
     def exit():
-        """Terminate the program`s execution"""
+        """Terminate the program's execution."""
         sys.exit()
 
     def run(self):

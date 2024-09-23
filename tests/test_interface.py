@@ -18,3 +18,6 @@ def test_habit_added(interface):
         errors.append("The object stored is not a Habit!")
 
     assert not errors
+
+def test_habits_visualized(interface):
+    assert interface.habit_tracker.view_habits() == ', '.join([habit.name for habit in interface.habit_tracker.habits])

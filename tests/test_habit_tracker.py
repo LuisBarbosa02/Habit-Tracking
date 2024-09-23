@@ -19,3 +19,6 @@ def test_add_habit(tracker):
 
 def test_view_habits(tracker):
     assert tracker.view_habits() == ', '.join([habit.name for habit in tracker.habits])
+
+def test_load_habits(tracker):
+    assert all(isinstance(habit, Habit) for habit in tracker.habits)
