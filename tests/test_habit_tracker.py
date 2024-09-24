@@ -1,6 +1,7 @@
 import pytest
 from ..habit_tracker import Habit, HabitTracker
 import sqlite3
+import datetime
 
 
 @pytest.fixture
@@ -37,6 +38,32 @@ class TestHabitTracker:
         habit = tracker.get_habit("Test")
         assert habit.habit_id == [habit.habit_id for habit in tracker.habits if habit.name == "Test"][0]
 
+    def test_complete_habit(self, tracker):
+        habit = tracker.get_habit("Test")
+        num_log = len(habit.log)
+        tracker.complete_habit("Test")
+        errors = []
+
+        if len(habit.log) != num_log + 1:
+            errors.append("Nothing was added to the log.")
+        if not isinstance(habit.log[-1], datetime.datetime):
+            errors.append("The log added was not a date and time.")
+
+        with sqlite3.connect("habits.db") as conn:
+            cur = conn.cursor()
+            cur.execute("SELECT * FROM habits_log ORDER BY log_id DESC LIMIT 1;")
+
+            try:
+                _, habit_id, date = cur.fetchone()
+
+                if habit_id != habit.habit_id:
+                    errors.append("This log is not referencing the right habit.")
+                if not isinstance(datetime.datetime.strptime(date, "%Y-%m-%d %H-%M-%S"), datetime.datetime):
+                    errors.append("This log did not retrieve a date and time.")
+            except ValueError:
+                errors.append("No log was added to the database table.")
+
+        assert not errors, "\n".join(errors)
 
     def test_load_habits(self, tracker):
         assert all(isinstance(habit, Habit) for habit in tracker.habits)
@@ -57,6 +84,10 @@ class TestHabitTracker:
             cur.execute("SELECT * FROM habits WHERE habit_id = ?;", (del_habit.habit_id,))
             if cur.fetchone():
                 errors.append("The value was not excluded from the database.")
+
+            cur.execute("SELECT * FROM habits_log WHERE habit_id = ?;", (del_habit.habit_id,))
+            if cur.fetchall():
+                errors.append("Its log was not deleted.")
 
         assert not errors, "\n".join(errors)
 

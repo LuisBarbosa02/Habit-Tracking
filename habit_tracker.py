@@ -42,7 +42,12 @@ class Habit:
         """Get the name of the habit."""
         return self._name
 
+    def is_complete(self):
+        """Add the date and time of a habit completion."""
+        self.log.append(datetime.datetime.today())
+
     def __str__(self):
+        """It shows the name, periodicity, creation date, and description if a habit instance is printed."""
         return (f"\n{"Name":13s}: {self.name}\n{"Periodicity":13s}: {self.periodicity}"
                 f"\n{"Creation Date":13s}: {self.creation_date}\n{"Description":13s}: {self.description}")
 
@@ -81,11 +86,33 @@ class HabitTracker:
         habit = Habit(habit_id, name, periodicity, description, creation_date)
         self.habits.append(habit)
 
+    def complete_habit(self, name):
+        """
+        Mark a chosen habit as completed, adding to its internal log and a database.
+
+        :param name: The habits' name.
+        :return:
+        """
+        habit = self.get_habit(name)
+        habit.is_complete()
+
+        with sqlite3.connect("habits.db") as conn:
+            cur = conn.cursor()
+            cur.execute("INSERT INTO habits_log (habit_id, date) VALUES (?, ?)",
+                        (habit.habit_id, habit.log[-1].strftime("%Y-%m-%d %H-%M-%S")))
+            conn.commit()
+
     def delete_habit(self, name):
-        """Delete a habit from the database, and inside the class."""
+        """
+        Delete a habit from the database, and inside the class.
+
+        :param str name: Name of the habit to be deleted.
+        :return:
+        """
         with sqlite3.connect("habits.db") as conn:
             cur = conn.cursor()
             cur.execute("DELETE FROM habits WHERE habit_id = ?;", (self.get_habit(name).habit_id,))
+            cur.execute("DELETE FROM habits_log WHERE habit_id = ?;", (self.get_habit(name).habit_id,))
             conn.commit()
 
         self.habits = [habit for habit in self.habits if habit.name != name]
@@ -93,7 +120,9 @@ class HabitTracker:
     def view_habits(self, periodicity):
         """Returns a string containing habits' names.
 
-        :param str periodicity: Filter the habits' visualization by its periodicity
+        :param str periodicity: Filter the habits' visualization by its periodicity.
+        :return: The name of all habits, or the name of habits filtered by its periodicity.
+        :rtype: str
         """
         if periodicity == '':
             return ", ".join([habit.name for habit in self.habits])
@@ -101,7 +130,7 @@ class HabitTracker:
             return ", ".join([habit.name for habit in self.habits if habit.periodicity == periodicity])
 
     def load_habits(self):
-        """Load habits from a database into the class."""
+        """Load habits and its logs from a database into the class."""
         with sqlite3.connect("habits.db") as conn:
             cur = conn.cursor()
 
@@ -113,14 +142,32 @@ class HabitTracker:
                 creation_date TEXT NOT NULL);
             """)
 
+            cur.execute("""CREATE TABLE IF NOT EXISTS habits_log(
+                log_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                habit_id INTEGER NOT NULL,
+                date TEXT NOT NULL,
+                FOREIGN KEY (habit_id) REFERENCES habits(habit_id) ON DELETE CASCADE);
+            """)
+
             habits_data = cur.execute("""SELECT habit_id, name, periodicity, description, creation_date
                                         FROM habits;""").fetchall()
             for habit_id, name, periodicity, description, creation_date in habits_data:
-                self.habits.append(Habit(habit_id, name, periodicity, description,
-                                         datetime.datetime.strptime(creation_date, "%Y-%m-%d").date()))
+                habit = Habit(habit_id, name, periodicity, description,
+                              datetime.datetime.strptime(creation_date, "%Y-%m-%d").date())
+                self.habits.append(habit)
+
+                log_data = cur.execute("SELECT date FROM habits_log WHERE habit_id = ?;",
+                                       (habit_id,)).fetchall()
+                for date in log_data:
+                    habit.log.append(datetime.datetime.strptime(date[0], "%Y-%m-%d %H-%M-%S"))
 
             conn.commit()
 
     def get_habit(self, name):
-        """Get an instance of a Habit by its name."""
+        """
+        Get an instance of a Habit by its name.
+
+        :param str name: Name of the habit.
+        :return: An instance of the habit.
+        """
         return [habit for habit in self.habits if habit.name == name][0]

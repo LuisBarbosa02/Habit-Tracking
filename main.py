@@ -12,7 +12,8 @@ class Interface:
     def __init__(self):
         """Initializes the class that will keep track of all habits."""
         self.habit_tracker = HabitTracker()
-        self.choices = {"1": self.add_habit, "2": self.view_habits_menu, "3": self.delete_habit, "4": self.exit}
+        self.choices = {"1": self.add_habit, "2": self.view_habits_menu, "3": self.complete_habit,
+                        "4": self.delete_habit, "5": self.exit}
 
     @staticmethod
     def display_menu():
@@ -20,8 +21,9 @@ class Interface:
         print("\n=== Habit Tracker Menu ===")
         print("1. Add habit")
         print("2. View habits")
-        print("3. Delete habit")
-        print("4. Exit\n")
+        print("3. Complete habit")
+        print("4. Delete habit")
+        print("5. Exit\n")
 
     def add_habit(self):
         """Create a new habit."""
@@ -63,8 +65,25 @@ class Interface:
                 name = input("This habit does not exist, choose a valid one: ")
             print(self.habit_tracker.get_habit(name))
 
+    def complete_habit(self):
+        """Mark a habit as completed."""
+        if not self.habit_tracker.habits:
+            print("There aren't any habits to complete.")
+            self.run()
+
+        print("\nAvailable habits:\n" + self.habit_tracker.view_habits(periodicity='') + "\n")
+        name = input("Choose habit to complete: ")
+        while name not in [habit.name for habit in self.habit_tracker.habits]:
+            name = input("Choose a valid habit: ")
+
+        self.habit_tracker.complete_habit(name)
+
     def delete_habit(self):
         """Delete a habit."""
+        if not self.habit_tracker.habits:
+            print("There aren't any habits to delete.")
+            self.run()
+
         name = input("What is the name of the habit to be deleted? ")
         while name not in [habit.name for habit in self.habit_tracker.habits]:
             name = input("That habit does not exists, choose a valid name: ")

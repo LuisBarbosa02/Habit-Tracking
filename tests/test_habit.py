@@ -10,3 +10,7 @@ def habit():
 
 def test_name_property(habit):
     assert habit.name == "Testing"
+
+def test_is_complete(habit):
+    habit.is_complete()
+    assert isinstance(habit.log[-1], datetime.datetime)
