@@ -42,6 +42,10 @@ class Habit:
         """Get the name of the habit."""
         return self._name
 
+    def __str__(self):
+        return (f"\n{"Name":13s}: {self.name}\n{"Periodicity":13s}: {self.periodicity}"
+                f"\n{"Creation Date":13s}: {self.creation_date}\n{"Description":13s}: {self.description}")
+
 
 class HabitTracker:
     """
@@ -81,13 +85,16 @@ class HabitTracker:
         """Delete a habit from the database, and inside the class."""
         with sqlite3.connect("habits.db") as conn:
             cur = conn.cursor()
-            cur.execute("DELETE FROM habits WHERE habit_id = ?;", (self._get_habit(name).habit_id,))
+            cur.execute("DELETE FROM habits WHERE habit_id = ?;", (self.get_habit(name).habit_id,))
             conn.commit()
 
         self.habits = [habit for habit in self.habits if habit.name != name]
 
     def view_habits(self, periodicity):
-        """Returns a string containing all habits' names."""
+        """Returns a string containing habits' names.
+
+        :param str periodicity: Filter the habits' visualization by its periodicity
+        """
         if periodicity == '':
             return ", ".join([habit.name for habit in self.habits])
         else:
@@ -110,10 +117,10 @@ class HabitTracker:
                                         FROM habits;""").fetchall()
             for habit_id, name, periodicity, description, creation_date in habits_data:
                 self.habits.append(Habit(habit_id, name, periodicity, description,
-                                         datetime.datetime.strptime(creation_date, "%Y-%m-%d").today()))
+                                         datetime.datetime.strptime(creation_date, "%Y-%m-%d").date()))
 
             conn.commit()
 
-    def _get_habit(self, name):
+    def get_habit(self, name):
         """Get an instance of a Habit by its name."""
         return [habit for habit in self.habits if habit.name == name][0]

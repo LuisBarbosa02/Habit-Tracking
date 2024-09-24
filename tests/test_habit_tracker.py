@@ -34,7 +34,7 @@ class TestHabitTracker:
         assert not errors, "\n{}".format("\n".join(errors))
 
     def test_get_habit(self, tracker):
-        habit = tracker._get_habit("Test")
+        habit = tracker.get_habit("Test")
         assert habit.habit_id == [habit.habit_id for habit in tracker.habits if habit.name == "Test"][0]
 
 
@@ -43,7 +43,7 @@ class TestHabitTracker:
 
     def test_delete_habit(self, tracker):
         num_habits = len(tracker.habits)
-        del_habit = tracker._get_habit("Test")
+        del_habit = tracker.get_habit("Test")
         tracker.delete_habit("Test")
         errors = []
 
