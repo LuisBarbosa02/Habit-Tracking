@@ -39,7 +39,7 @@ class Habit:
         """
         Add the date and time of a habit completion.
 
-        :param date: The date and time the habit was completed.
+        :param datetime.datetime date: The date and time the habit was completed.
         :return:
         """
         self.log.append(date)
@@ -103,13 +103,13 @@ class HabitTracker:
         """
         Define and store a habit inside a database, and inside the class.
 
-        :param name: The habit's name.
-        :param periodicity: The period in which the habit must be completed.
-        :param description: Clear and concise description of the habit's task.
-        :param creation_date: The date and time the habit was created.
-        :param current_streak: The habits' current streak.
-        :param longest_streak: The habits' longest streak.
-        :param streak_breaks: The habits' number of streaks broken.
+        :param str name: The habit's name.
+        :param str periodicity: The period in which the habit must be completed.
+        :param str description: Clear and concise description of the habit's task.
+        :param datetime.date creation_date: The date and time the habit was created.
+        :param int current_streak: The habits' current streak.
+        :param int longest_streak: The habits' longest streak.
+        :param int streak_breaks: The habits' number of streaks broken.
         :return:
         """
         with sqlite3.connect("habits.db") as conn:
@@ -128,8 +128,8 @@ class HabitTracker:
         """
         Mark a chosen habit as completed, adding to its internal log and a database.
 
-        :param name: The habits' name.
-        :param date: The date and time the habit was completed.
+        :param str name: The habits' name.
+        :param datetime.datetime date: The date and time the habit was completed.
         :return:
         """
         habit = self.get_habit(name)

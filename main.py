@@ -7,6 +7,7 @@ class Interface:
     Interface that simplifies the interaction with the program.
 
     :ivar habit_tracker.HabitTracker habit_tracker: The class that manages all the habits'
+    :ivar dict choices: Main menu choices.
     """
 
     def __init__(self):
