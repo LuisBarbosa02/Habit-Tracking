@@ -77,6 +77,7 @@ class Interface:
             name = input("Choose a valid habit: ")
 
         self.habit_tracker.complete_habit(name)
+        print("Habit completed.")
 
     def delete_habit(self):
         """Delete a habit."""

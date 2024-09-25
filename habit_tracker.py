@@ -1,5 +1,6 @@
 import sqlite3
 import datetime
+from dateutil.relativedelta import relativedelta
 
 
 class Habit:
@@ -17,24 +18,16 @@ class Habit:
     :ivar list log: A list containing the date and time the habit was completed.
     """
 
-    def __init__(self,habit_id, name, periodicity, description, creation_date):
-        """
-        Initializes a habit with name, periodicity, and description.
-
-        :param str name: The habits' name.
-        :param str periodicity: Period in which the habit must be completed.
-        :param str description: lear and concise description of the habits' task.
-        :param datetime.date creation_date: The date in which the habit was created.
-        :param int habit_id: The habits' id.
-        """
+    def __init__(self,habit_id, name, periodicity, description, creation_date, current_streak, longest_streak,
+                 streak_breaks):
         self.habit_id = habit_id
         self._name = name
         self.periodicity = periodicity
         self.description = description
         self.creation_date = creation_date
-        self.current_streak = 0
-        self.longest_streak = 0
-        self.streak_breaks = 0
+        self.current_streak = current_streak
+        self.longest_streak = longest_streak
+        self.streak_breaks = streak_breaks
         self.log = []
 
     @property
@@ -42,9 +35,50 @@ class Habit:
         """Get the name of the habit."""
         return self._name
 
-    def is_complete(self):
-        """Add the date and time of a habit completion."""
-        self.log.append(datetime.datetime.today())
+    def is_complete(self, date=datetime.datetime.today()):
+        """
+        Add the date and time of a habit completion.
+
+        :param date: The date and time the habit was completed.
+        :return:
+        """
+        self.log.append(date)
+
+    def calculate_streak(self):
+        """Calculate streaks for the habits."""
+        diff = relativedelta(self.log[-1],
+                             self.creation_date if len(self.log) == 1 else self.log[-2])
+
+        if self.periodicity == "daily":
+            if diff.days < 1 or (diff.days == 1 and diff.hours == 0 and diff.minutes == 0):
+                self.current_streak += 1
+            else:
+                self.longest_streak = max(self.current_streak, self.longest_streak)
+                self.current_streak = 0
+                self.streak_breaks += 1
+
+        elif self.periodicity == "weekly":
+            if diff.days < 7 or (diff.days == 7 and diff.hours == 0 and diff.minutes == 0):
+                self.current_streak += 1
+            else:
+                self.longest_streak = max(self.current_streak, self.longest_streak)
+                self.current_streak = 0
+                self.streak_breaks += 1
+
+        elif self.periodicity == "monthly":
+            if diff.months < 1 or (diff.months == 1 and diff.days == 0 and diff.hours == 0 and diff.minutes == 0):
+                self.current_streak += 1
+            else:
+                self.longest_streak = max(self.current_streak, self.longest_streak)
+                self.current_streak = 0
+                self.streak_breaks += 1
+
+        with sqlite3.connect("habits.db") as conn:
+            cur = conn.cursor()
+            cur.execute("UPDATE habits SET current_streak = ?, longest_streak = ?, streak_breaks = ?"
+                        "WHERE habit_id = ?", (self.current_streak, self.longest_streak, self.streak_breaks,
+                                               self.habit_id))
+            conn.commit()
 
     def __str__(self):
         """It shows the name, periodicity, creation date, and description if a habit instance is printed."""
@@ -64,17 +98,20 @@ class HabitTracker:
         self.habits = []
         self.load_habits()
 
-    def add_habit(self, name, periodicity, description):
+    def add_habit(self, name, periodicity, description, creation_date=datetime.date.today(),
+                  current_streak=0, longest_streak=0, streak_breaks=0):
         """
         Define and store a habit inside a database, and inside the class.
 
         :param name: The habit's name.
         :param periodicity: The period in which the habit must be completed.
         :param description: Clear and concise description of the habit's task.
+        :param creation_date: The date and time the habit was created.
+        :param current_streak: The habits' current streak.
+        :param longest_streak: The habits' longest streak.
+        :param streak_breaks: The habits' number of streaks broken.
         :return:
         """
-        creation_date = datetime.date.today()
-
         with sqlite3.connect("habits.db") as conn:
             cur = conn.cursor()
             cur.execute("""INSERT INTO habits (name, periodicity, description, creation_date)
@@ -83,22 +120,25 @@ class HabitTracker:
             habit_id = cur.lastrowid
             conn.commit()
 
-        habit = Habit(habit_id, name, periodicity, description, creation_date)
+        habit = Habit(habit_id, name, periodicity, description, creation_date, current_streak, longest_streak,
+                      streak_breaks)
         self.habits.append(habit)
 
-    def complete_habit(self, name):
+    def complete_habit(self, name, date=datetime.datetime.today()):
         """
         Mark a chosen habit as completed, adding to its internal log and a database.
 
         :param name: The habits' name.
+        :param date: The date and time the habit was completed.
         :return:
         """
         habit = self.get_habit(name)
-        habit.is_complete()
+        habit.is_complete(date)
+        habit.calculate_streak()
 
         with sqlite3.connect("habits.db") as conn:
             cur = conn.cursor()
-            cur.execute("INSERT INTO habits_log (habit_id, date) VALUES (?, ?)",
+            cur.execute("INSERT INTO habits_log (habit_id, date) VALUES (?, ?);",
                         (habit.habit_id, habit.log[-1].strftime("%Y-%m-%d %H-%M-%S")))
             conn.commit()
 
@@ -139,7 +179,10 @@ class HabitTracker:
                 name TEXT NOT NULL,
                 periodicity TEXT NOT NULL,
                 description TEXT NOT NULL,
-                creation_date TEXT NOT NULL);
+                creation_date TEXT NOT NULL,
+                current_streak INTEGER DEFAULT 0,
+                longest_streak INTEGER DEFAULT 0,
+                streak_breaks INTEGER DEFAULT 0);
             """)
 
             cur.execute("""CREATE TABLE IF NOT EXISTS habits_log(
@@ -149,11 +192,14 @@ class HabitTracker:
                 FOREIGN KEY (habit_id) REFERENCES habits(habit_id) ON DELETE CASCADE);
             """)
 
-            habits_data = cur.execute("""SELECT habit_id, name, periodicity, description, creation_date
+            habits_data = cur.execute("""SELECT habit_id, name, periodicity, description, creation_date, current_streak,
+                                        longest_streak, streak_breaks
                                         FROM habits;""").fetchall()
-            for habit_id, name, periodicity, description, creation_date in habits_data:
+            for habit_id, name, periodicity, description, creation_date, current_streak, longest_streak, \
+                    streak_breaks in habits_data:
                 habit = Habit(habit_id, name, periodicity, description,
-                              datetime.datetime.strptime(creation_date, "%Y-%m-%d").date())
+                              datetime.datetime.strptime(creation_date, "%Y-%m-%d").date(),
+                              current_streak, longest_streak, streak_breaks)
                 self.habits.append(habit)
 
                 log_data = cur.execute("SELECT date FROM habits_log WHERE habit_id = ?;",
