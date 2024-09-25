@@ -38,3 +38,9 @@ class TestHabitStatistics:
                 errors.append(f"{name} was not supposed to be in the result.")
 
         assert not errors, '\n'.join(errors)
+
+    def test_longest_streak_habit(self, tracker):
+        result = habit_statistics.longest_streak_habit("Read", tracker)
+        habit = tracker.get_habit("Read")
+        assert result == f'"{habit.name}" longest streak: {habit.longest_streak}'
+

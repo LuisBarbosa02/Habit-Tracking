@@ -7,3 +7,7 @@ def longest_streak_all(habit_tracker):
         formatted_strings.append(f"{habit.name}: {habit.longest_streak}")
 
     return ", ".join(formatted_strings)
+
+def longest_streak_habit(name, habit_tracker):
+    habit = habit_tracker.get_habit(name)
+    return f'"{habit.name}" longest streak: {habit.longest_streak}'

@@ -38,7 +38,7 @@ class Interface:
         while periodicity not in ["daily", "weekly", "monthly"]:
             periodicity = input("Choose a valid periodicity: ").strip().lower()
 
-        description = input("Clearly and concisely describe the habits' task: ")
+        description = input("Clearly and concisely describe the habits' task: ").strip()
         self.habit_tracker.add_habit(name, periodicity, description)
 
     def view_habits_menu(self):
@@ -48,9 +48,9 @@ class Interface:
         print("2. View habits per periodicity")
         print("3. Specific habit information\n")
 
-        choice = input("Choose an option: ")
+        choice = input("Choose an option: ").strip()
         while choice not in ["1", "2", "3"]:
-            choice = input("Choose a valid option: ")
+            choice = input("Choose a valid option: ").strip()
 
         if not self.habit_tracker.habits:
             print("No habits' defined, create a new one first.")
@@ -63,9 +63,9 @@ class Interface:
                 periodicity = input("Choose a valid periodicity: ").strip().lower()
             print("\n" + self.habit_tracker.view_habits(periodicity=periodicity))
         elif choice == "3":
-            name = input("Choose a habit by name: ")
+            name = input("Choose a habit by name: ").strip()
             while name not in [habit.name for habit in self.habit_tracker.habits]:
-                name = input("This habit does not exist, choose a valid one: ")
+                name = input("This habit does not exist, choose a valid one: ").strip()
             print(self.habit_tracker.get_habit(name))
 
     def complete_habit(self):
@@ -75,28 +75,37 @@ class Interface:
             self.run()
 
         print("\nAvailable habits:\n" + self.habit_tracker.view_habits(periodicity='') + "\n")
-        name = input("Choose habit to complete: ")
+        name = input("Choose habit to complete: ").strip()
         while name not in [habit.name for habit in self.habit_tracker.habits]:
-            name = input("Choose a valid habit: ")
+            name = input("Choose a valid habit: ").strip()
 
         self.habit_tracker.complete_habit(name)
         print("Habit completed.")
 
     def analyze_habits_menu(self):
+        """Menu with multiple insights from the habits."""
         if not self.habit_tracker.habits:
             print("No habits to analyze, define one first.")
             self.run()
 
         print("\n=== Analyze Menu ===")
-        print("1. Longest streak of all habits\n")
+        print("1. Longest streak of all habits")
+        print("2. Longest streak of specific habit\n")
 
-        choice = input("Choose an option: ")
-        while choice not in ["1"]:
-            choice = input("Choose a valid option: ")
+        choice = input("Choose an option: ").strip()
+        while choice not in ["1", "2"]:
+            choice = input("Choose a valid option: ").strip()
 
         if choice == "1":
             print("\nLongest habit(s):")
             print(habit_statistics.longest_streak_all(self.habit_tracker))
+        elif choice == "2":
+            print("\nAvailable habits:")
+            print(self.habit_tracker.view_habits(periodicity='') + "\n")
+            name = input("Choose a habit: ").strip()
+            while name not in [habit.name for habit in self.habit_tracker.habits]:
+                name = input("Choose a valid habit: ").strip()
+            print("\n" + habit_statistics.longest_streak_habit(name, self.habit_tracker))
 
     def delete_habit(self):
         """Delete a habit."""
@@ -120,10 +129,10 @@ class Interface:
         """Main loop that runs the interface."""
         while True:
             self.display_menu()
-            choice = input("Choose an option: ")
+            choice = input("Choose an option: ").strip()
             choice = self.choices.get(choice)
             while choice is None:
-                choice = input("Choose a valid option: ")
+                choice = input("Choose a valid option: ").strip()
                 choice = self.choices.get(choice)
             choice()
 
