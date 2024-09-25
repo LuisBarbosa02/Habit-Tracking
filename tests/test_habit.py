@@ -5,7 +5,8 @@ import datetime
 
 @pytest.fixture
 def habit():
-    return Habit(1, "Testing", "daily", "Just a simple test.", datetime.date.today())
+    return Habit(1, "Testing", "daily", "Just a simple test.", datetime.date.today(),
+                 0, 0, 0)
 
 
 def test_name_property(habit):

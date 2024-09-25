@@ -45,13 +45,14 @@ def create_habit_example(habits_char, diff_current_date_days, diff_start_date_mo
         habit_tracker.complete_habit(habits_char[0], log)
 
 
-create_habit_example(habit1, 0, (1, 15), (0, 1),
+def run_examples():
+    create_habit_example(habit1, 0, (1, 15), (0, 1),
                      11, 2)
-create_habit_example(habit2, 1, (1, 11), (0, 1),
+    create_habit_example(habit2, 1, (1, 11), (0, 1),
                      6, 3)
-create_habit_example(habit3, 2, (1, 23), (0, 7),
+    create_habit_example(habit3, 2, (1, 23), (0, 7),
                      2, 2)
-create_habit_example(habit4, 3, (1, 27), (0, 7),
+    create_habit_example(habit4, 3, (1, 27), (0, 7),
                      3, 4)
-create_habit_example(habit5, 4, (3, 9), (1, 0),
+    create_habit_example(habit5, 4, (3, 9), (1, 0),
                      1, 1)

@@ -1,5 +1,6 @@
 import sys
 from habit_tracker import HabitTracker
+import habit_statistics
 
 
 class Interface:
@@ -14,7 +15,7 @@ class Interface:
         """Initializes the class that will keep track of all habits."""
         self.habit_tracker = HabitTracker()
         self.choices = {"1": self.add_habit, "2": self.view_habits_menu, "3": self.complete_habit,
-                        "4": self.delete_habit, "5": self.exit}
+                        "4": self.analyze_habits_menu, "5": self.delete_habit, "6": self.exit}
 
     @staticmethod
     def display_menu():
@@ -23,8 +24,9 @@ class Interface:
         print("1. Add habit")
         print("2. View habits")
         print("3. Complete habit")
-        print("4. Delete habit")
-        print("5. Exit\n")
+        print("4. Analyze habits")
+        print("5. Delete habit")
+        print("6. Exit\n")
 
     def add_habit(self):
         """Create a new habit."""
@@ -79,6 +81,22 @@ class Interface:
 
         self.habit_tracker.complete_habit(name)
         print("Habit completed.")
+
+    def analyze_habits_menu(self):
+        if not self.habit_tracker.habits:
+            print("No habits to analyze, define one first.")
+            self.run()
+
+        print("\n=== Analyze Menu ===")
+        print("1. Longest streak of all habits\n")
+
+        choice = input("Choose an option: ")
+        while choice not in ["1"]:
+            choice = input("Choose a valid option: ")
+
+        if choice == "1":
+            print("\nLongest habit(s):")
+            print(habit_statistics.longest_streak_all(self.habit_tracker))
 
     def delete_habit(self):
         """Delete a habit."""
