@@ -44,3 +44,22 @@ class TestHabitStatistics:
         habit = tracker.get_habit("Read")
         assert result == f'"{habit.name}" longest streak: {habit.longest_streak}'
 
+    def test_most_struggled_habit(self, tracker):
+        max_val = [habit.streak_breaks for habit in tracker.habits]
+        streak_breaks = [f"{habit.name}: {habit.streak_breaks}" for habit in tracker.habits
+                          if habit.streak_breaks == max(max_val)]
+
+        result = habit_statistics.most_struggled_habit(tracker)
+        errors = []
+
+        for name in streak_breaks:
+            if name not in result:
+                errors.append(f"{name} not in result.")
+
+        all_names_in_result = result.split(", ")
+        for name in all_names_in_result:
+            if name not in streak_breaks:
+                errors.append(f"{name} was not supposed to be in the result.")
+
+        assert not errors, '\n'.join(errors)
+

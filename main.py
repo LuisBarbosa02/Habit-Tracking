@@ -90,10 +90,11 @@ class Interface:
 
         print("\n=== Analyze Menu ===")
         print("1. Longest streak of all habits")
-        print("2. Longest streak of specific habit\n")
+        print("2. Longest streak of specific habit")
+        print("3. Most struggled of all habits\n")
 
         choice = input("Choose an option: ").strip()
-        while choice not in ["1", "2"]:
+        while choice not in ["1", "2", "3"]:
             choice = input("Choose a valid option: ").strip()
 
         if choice == "1":
@@ -106,6 +107,9 @@ class Interface:
             while name not in [habit.name for habit in self.habit_tracker.habits]:
                 name = input("Choose a valid habit: ").strip()
             print("\n" + habit_statistics.longest_streak_habit(name, self.habit_tracker))
+        elif choice == "3":
+            print("\nMost struggled habit(s):")
+            print(habit_statistics.most_struggled_habit(self.habit_tracker))
 
     def delete_habit(self):
         """Delete a habit."""
