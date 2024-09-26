@@ -12,7 +12,7 @@ class Interface:
     """
 
     def __init__(self):
-        """Initializes the class that will keep track of all habits."""
+        """Initializes the class that will keep track of all habits, and a dict containing the main menu choices."""
         self.habit_tracker = HabitTracker()
         self.choices = {"1": self.add_habit, "2": self.view_habits_menu, "3": self.complete_habit,
                         "4": self.analyze_habits_menu, "5": self.delete_habit, "6": self.exit}
@@ -117,12 +117,14 @@ class Interface:
             print("There aren't any habits to delete.")
             self.run()
 
+        print("\nAvailable habits:")
+        print(self.habit_tracker.view_habits(periodicity=''), "\n")
         name = input("What is the name of the habit to be deleted? ")
         while name not in [habit.name for habit in self.habit_tracker.habits]:
             name = input("That habit does not exists, choose a valid name: ")
 
         self.habit_tracker.delete_habit(name)
-        print(f"{name} successfully deleted.")
+        print(f'"{name}" successfully deleted.')
 
     @staticmethod
     def exit():

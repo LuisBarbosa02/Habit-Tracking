@@ -82,8 +82,10 @@ class Habit:
 
     def __str__(self):
         """It shows the name, periodicity, creation date, and description if a habit instance is printed."""
-        return (f"\n{"Name":13s}: {self.name}\n{"Periodicity":13s}: {self.periodicity}"
-                f"\n{"Creation Date":13s}: {self.creation_date}\n{"Description":13s}: {self.description}")
+        return (f"\n{"Name":14s}: {self.name}\n{"Periodicity":14s}: {self.periodicity}"
+                f"\n{"Creation Date":14s}: {self.creation_date}\n{"Description":14s}: {self.description}"
+                f"\n{"Current Streak":14s}: {self.current_streak}\n{"Longest Streak":14s}: {self.longest_streak}"
+                f"\n{"Times Broken":14s}: {self.streak_breaks}")
 
 
 class HabitTracker:
