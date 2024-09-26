@@ -4,7 +4,7 @@ A program that helps create, control, and maintain relevant information about ha
 
 ## Table of Contents
 1. [Prerequisites](#prerequisites)
-2.  [Installation](#installation)
+2. [Installation](#installation)
 3. [Usage](#usage)
 4. [Troubleshooting](#troubleshooting)
 5. [License](#license)
@@ -26,8 +26,14 @@ If not, Python can be downloaded here [here](https://www.python.org/downloads/).
 ## Installation
 
 1. Clone the repository (or download the ZIP file):
+- For standard use run:
 ```bash
 git clone https://github.com/LuisBarbosa02/Habit-Tracking.git
+cd Habit-Tracking
+```
+- For dev use run:
+```bash
+git clone -b dev https://github.com/LuisBarbosa02/Habit-Tracking.git
 cd Habit-Tracking
 ```
 2. Set up a virtual environment (Recommended):
