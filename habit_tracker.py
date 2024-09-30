@@ -19,7 +19,7 @@ class Habit:
     """
 
     def __init__(self,habit_id, name, periodicity, description, creation_date, current_streak, longest_streak,
-                 streak_breaks):
+                 streak_breaks):  # All the information about habits will be contained inside the habit itself
         self.habit_id = habit_id
         self._name = name
         self.periodicity = periodicity
@@ -35,7 +35,7 @@ class Habit:
         """Get the name of the habit."""
         return self._name
 
-    def is_complete(self, date=datetime.datetime.today()):
+    def is_complete(self, date=datetime.datetime.today()):  # The completion of the habit is a log of date and time
         """
         Add the date and time of a habit completion.
 
@@ -44,7 +44,7 @@ class Habit:
         """
         self.log.append(date)
 
-    def calculate_streak(self):
+    def calculate_streak(self):  # The streak is calculated by the habit itself
         """Calculate streaks for the habits."""
         diff = relativedelta(self.log[-1],
                              self.creation_date if len(self.log) == 1 else self.log[-2])
@@ -88,7 +88,7 @@ class Habit:
                 f"\n{"Times Broken":14s}: {self.streak_breaks}")
 
 
-class HabitTracker:
+class HabitTracker:  # This class will be used to control all the operations involving habits
     """
     A class that manages habit classes.
 

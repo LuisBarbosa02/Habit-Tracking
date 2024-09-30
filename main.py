@@ -131,7 +131,7 @@ class Interface:
         """Terminate the program's execution."""
         sys.exit()
 
-    def run(self):
+    def run(self):  # This will be used to run all the program
         """Main loop that runs the interface."""
         while True:
             self.display_menu()
@@ -143,6 +143,6 @@ class Interface:
             choice()
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # Run the interface only when executed as main program
     interface = Interface()
     interface.run()
